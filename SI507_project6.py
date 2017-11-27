@@ -91,7 +91,7 @@ def setup_database():
 def insert_into_db(conn, cur, table, data_dict, no_return=False):
     """Accepts connection and cursor, table name, dictionary that represents one row, and inserts data into table. (Not the only way to do this!)"""
     column_names = data_dict.keys()
-    print(column_names, "column_names") # for debug
+    #print(column_names, "column_names") # for debug
     if not no_return:
         query = sql.SQL('INSERT INTO {0}({1}) VALUES({2}) ON CONFLICT DO NOTHING RETURNING id').format(
             sql.SQL(table),
@@ -112,8 +112,8 @@ def insert_into_db(conn, cur, table, data_dict, no_return=False):
 
 def insert_sites_from_csv(state, csv):
     state_dict={'name':state}
-    print(state_dict)
-    print (type(state_dict))
+    #print(state_dict)
+    #print (type(state_dict))
     state_id = insert_into_db(db_connection, db_cursor, "States", state_dict)
     #print(state_id_mi)
     insert_dict = {}
@@ -127,7 +127,7 @@ def insert_sites_from_csv(state, csv):
         insert_dict['state_id'] = line_dict['State_ID']
         insert_dict['location'] = line_dict['LOCATION']
         insert_dict['description'] = line_dict['DESCRIPTION']
-        print(insert_dict)
+        #print(insert_dict)
         insert_into_db(db_connection, db_cursor, "Sites", insert_dict, True)  
 
     db_connection.commit()
@@ -165,7 +165,7 @@ def execute_and_store(query, key):
     i = 0
     for r in results:
         #print(type(r))
-        print(r[key])
+        #print(r[key])
         var.append(r[key])
         #print(*r)
         #print(i)
@@ -182,7 +182,6 @@ print(all_locations)
 
 # In Python, query the database for all of the **names** of the sites whose **descriptions** include the word `beautiful`. 
 # Save the resulting data in a variable called `beautiful_sites`.
-
 beautiful_sites = execute_and_store("select name from sites where description like '%beautiful%'", "name")
 print("Here's beautiful_sites")
 print(beautiful_sites)
@@ -191,5 +190,22 @@ print(beautiful_sites)
 natl_lakeshores = execute_and_store("select count ('id') from sites where type = 'National Lakeshore'", "count")
 print("Here's natl_lakeshores")
 print(natl_lakeshores)
+
+# In Python, query your database for the **names of all the national sites in Michigan**. 
+# Save the resulting data in a variable called `michigan_names`. You should use an inner join query to do this.
+
+michigan_names = execute_and_store("select sites.name from sites inner join states on sites.state_id = states.id where states.name ilike '%michigan%';", "name")
+print("Here's michigan_names")
+print(michigan_names)
+
+# In Python, query your database for the **total number of sites in Arkansas**. Save the resulting data in a variable called `total_number_arkansas`. 
+# You can use multiple queries + Python code to do this, one subquery, or one inner join query. HINT: You'll need to use an aggregate function!
+total_number_arkansas = execute_and_store("select count (state_id) from sites inner join states on (sites.state_id = states.id) where states.name ilike '%arkansas%'", "count")
+print("Here's total_number_arkansas")
+print(total_number_arkansas)
+    
+
+
+
 
 # We have not provided any tests, but you could write your own in this file or another file, if you want.
