@@ -111,7 +111,27 @@ def insert_into_db(conn, cur, table, data_dict, no_return=False):
 
 
 
+def insert_sites_from_csv(state, csv):
+    state_dict={'name':state}
+    print(state_dict)
+    print (type(state_dict))
+    state_id = insert_into_db(db_connection, db_cursor, "States", state_dict)
+    #print(state_id_mi)
+    insert_dict = {}
+    the_reader = DictReader(open(csv, 'r'))
+    for line_dict in the_reader:
+        #print(line_dict)
+        #print (type(line_dict))
+        line_dict['State_ID'] = state_id
+        insert_dict['name'] = line_dict['NAME']
+        insert_dict['type'] = line_dict['TYPE']
+        insert_dict['state_id'] = line_dict['State_ID']
+        insert_dict['location'] = line_dict['LOCATION']
+        insert_dict['description'] = line_dict['DESCRIPTION']
+        print(insert_dict)
+        insert_into_db(db_connection, db_cursor, "Sites", insert_dict, True)  
 
+    db_connection.commit()
 
   
   
@@ -127,30 +147,14 @@ def insert_into_db(conn, cur, table, data_dict, no_return=False):
 
 get_connection_and_cursor();
 setup_database();
-
-
+insert_sites_from_csv('michigan', 'michigan.csv')
+insert_sites_from_csv('arkansas', 'arkansas.csv')
+insert_sites_from_csv('california', 'california.csv')
 # state_dict={'name':'Arkansas'}
 # insert(db_connection, db_cursor, "States", state_dict)
-state_dict={'name':'Michigan'}
-print(state_dict)
-print (type(state_dict))
-state_id_mi = insert_into_db(db_connection, db_cursor, "States", state_dict)
-#print(state_id_mi)
-insert_dict = {}
-the_reader = DictReader(open('michigan.csv', 'r'))
-for line_dict in the_reader:
-    #print(line_dict)
-    #print (type(line_dict))
-    line_dict['State_ID'] = state_id_mi
-    insert_dict['name'] = line_dict['NAME']
-    insert_dict['type'] = line_dict['TYPE']
-    insert_dict['state_id'] = line_dict['State_ID']
-    insert_dict['location'] = line_dict['LOCATION']
-    insert_dict['description'] = line_dict['DESCRIPTION']
-    print(insert_dict)
-    insert_into_db(db_connection, db_cursor, "Sites", insert_dict, True)  
 
-db_connection.commit()
+
+
 
 
 # Write code to make queries and save data in variables here.
