@@ -110,7 +110,6 @@ def insert_into_db(conn, cur, table, data_dict, no_return=False):
         return cur.fetchone()['id']
 
 
-
 def insert_sites_from_csv(state, csv):
     state_dict={'name':state}
     print(state_dict)
@@ -150,10 +149,6 @@ setup_database();
 insert_sites_from_csv('michigan', 'michigan.csv')
 insert_sites_from_csv('arkansas', 'arkansas.csv')
 insert_sites_from_csv('california', 'california.csv')
-# state_dict={'name':'Arkansas'}
-# insert(db_connection, db_cursor, "States", state_dict)
-
-
 
 
 
@@ -163,5 +158,38 @@ insert_sites_from_csv('california', 'california.csv')
 
 
 
+def execute_and_store(query, key):
+    db_cursor.execute(query)
+    results = db_cursor.fetchall()
+    var = []
+    i = 0
+    for r in results:
+        #print(type(r))
+        print(r[key])
+        var.append(r[key])
+        #print(*r)
+        #print(i)
+        #print(r.keys())
+        #print(*r.values())
+        #i = i + 1
+    return var
+ 
+
+
+all_locations = execute_and_store('select "location" from "sites"', 'location')
+print("Here's all_locations")
+print(all_locations)
+
+# In Python, query the database for all of the **names** of the sites whose **descriptions** include the word `beautiful`. 
+# Save the resulting data in a variable called `beautiful_sites`.
+
+beautiful_sites = execute_and_store("select name from sites where description like '%beautiful%'", "name")
+print("Here's beautiful_sites")
+print(beautiful_sites)
+
+#In Python, query the database for the total number of **sites whose type is `National Lakeshore`.** Save the resulting data in a variable called `natl_lakeshores`.
+natl_lakeshores = execute_and_store("select count ('id') from sites where type = 'National Lakeshore'", "count")
+print("Here's natl_lakeshores")
+print(natl_lakeshores)
 
 # We have not provided any tests, but you could write your own in this file or another file, if you want.
