@@ -8,6 +8,34 @@ import sys
 import json
 from csv import DictReader
 
+
+
+
+
+
+#tweet_diction["user"]["screen_name"]
+
+
+
+
+
+
+
+
+
+# state_dict={'name':'California'}
+# insert(db_connection, db_cursor, "States", state_dict)
+
+
+
+
+
+
+
+
+
+# Write code / functions to create tables with the columns you want and all database setup here.
+
 db_connection, db_cursor = None, None
 
 # Write code / functions to set up database connection and cursor here.
@@ -58,6 +86,7 @@ def setup_database():
     conn.commit()
 
 
+# Write code / functions to deal with CSV files and insert data into the database here.
 
 def insert_into_db(conn, cur, table, data_dict, no_return=False):
     """Accepts connection and cursor, table name, dictionary that represents one row, and inserts data into table. (Not the only way to do this!)"""
@@ -84,40 +113,9 @@ def insert_into_db(conn, cur, table, data_dict, no_return=False):
 
 
 
-
-
-get_connection_and_cursor();
-setup_database();
-# state_dict={'name':'Arkansas'}
-# insert(db_connection, db_cursor, "States", state_dict)
-state_dict={'name':'Michigan'}
-state_id = insert_into_db(db_connection, db_cursor, "States", state_dict)
-the_reader = DictReader(open('michigan.csv', 'r'))
-for line_dict in the_reader:
-  print(line_dict)
   
-  insert(db_connection, db_cursor, "Sites", line_dict)
-
-
-
-
-
-# state_dict={'name':'California'}
-# insert(db_connection, db_cursor, "States", state_dict)
-
-
-
-
-
-
-db_connection.commit()
-
-
-# Write code / functions to create tables with the columns you want and all database setup here.
-
-
-
-# Write code / functions to deal with CSV files and insert data into the database here.
+  
+  
 
 
 
@@ -127,6 +125,32 @@ db_connection.commit()
 
 # Write code to be invoked here (e.g. invoking any functions you wrote above)
 
+get_connection_and_cursor();
+setup_database();
+
+
+# state_dict={'name':'Arkansas'}
+# insert(db_connection, db_cursor, "States", state_dict)
+state_dict={'name':'Michigan'}
+print(state_dict)
+print (type(state_dict))
+state_id_mi = insert_into_db(db_connection, db_cursor, "States", state_dict)
+#print(state_id_mi)
+insert_dict = {}
+the_reader = DictReader(open('michigan.csv', 'r'))
+for line_dict in the_reader:
+    #print(line_dict)
+    #print (type(line_dict))
+    line_dict['State_ID'] = state_id_mi
+    insert_dict['name'] = line_dict['NAME']
+    insert_dict['type'] = line_dict['TYPE']
+    insert_dict['state_id'] = line_dict['State_ID']
+    insert_dict['location'] = line_dict['LOCATION']
+    insert_dict['description'] = line_dict['DESCRIPTION']
+    print(insert_dict)
+    insert_into_db(db_connection, db_cursor, "Sites", insert_dict, True)  
+
+db_connection.commit()
 
 
 # Write code to make queries and save data in variables here.
