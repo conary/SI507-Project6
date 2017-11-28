@@ -8,32 +8,6 @@ import sys
 import json
 from csv import DictReader
 
-
-
-
-
-
-#tweet_diction["user"]["screen_name"]
-
-
-
-
-
-
-
-
-
-# state_dict={'name':'California'}
-# insert(db_connection, db_cursor, "States", state_dict)
-
-
-
-
-
-
-
-
-
 # Write code / functions to create tables with the columns you want and all database setup here.
 
 db_connection, db_cursor = None, None
@@ -54,11 +28,7 @@ def get_connection_and_cursor():
 
     return db_connection, db_cursor
 
-def setup_database():
-    # Invovles DDL commands
-    # DDL --> Data Definition Language
-    # CREATE, DROP, ALTER, RENAME, TRUNCATE
-    
+def setup_database():    
     conn, db_cursor = get_connection_and_cursor()
     db_cursor.execute("DROP TABLE IF EXISTS Sites")
     db_cursor.execute("DROP TABLE IF EXISTS States")
@@ -77,11 +47,6 @@ def setup_database():
         Location VARCHAR(255),
         Description TEXT
         )""")
-
-
-    # db_cursor.execute(INSERT INTO  States(Name) VALUES(%S)) RETURNING ID
-    # result = db_cursor.fetchone()
-    # print(result)
     
     conn.commit()
 
@@ -109,18 +74,12 @@ def insert_into_db(conn, cur, table, data_dict, no_return=False):
     if not no_return:
         return cur.fetchone()['id']
 
-
 def insert_sites_from_csv(state, csv):
     state_dict={'name':state}
-    #print(state_dict)
-    #print (type(state_dict))
     state_id = insert_into_db(db_connection, db_cursor, "States", state_dict)
-    #print(state_id_mi)
     insert_dict = {}
     the_reader = DictReader(open(csv, 'r'))
     for line_dict in the_reader:
-        #print(line_dict)
-        #print (type(line_dict))
         line_dict['State_ID'] = state_id
         insert_dict['name'] = line_dict['NAME']
         insert_dict['type'] = line_dict['TYPE']
@@ -129,34 +88,19 @@ def insert_sites_from_csv(state, csv):
         insert_dict['description'] = line_dict['DESCRIPTION']
         #print(insert_dict)
         insert_into_db(db_connection, db_cursor, "Sites", insert_dict, True)  
-
     db_connection.commit()
-
-  
-  
-  
-
-
 
 # Make sure to commit your database changes with .commit() on the database connection.
 
-
-
 # Write code to be invoked here (e.g. invoking any functions you wrote above)
 
-get_connection_and_cursor();
-setup_database();
+get_connection_and_cursor()
+setup_database()
 insert_sites_from_csv('michigan', 'michigan.csv')
 insert_sites_from_csv('arkansas', 'arkansas.csv')
 insert_sites_from_csv('california', 'california.csv')
 
-
-
 # Write code to make queries and save data in variables here.
-
-
-
-
 
 def execute_and_store(query, key):
     db_cursor.execute(query)
@@ -164,48 +108,24 @@ def execute_and_store(query, key):
     var = []
     i = 0
     for r in results:
-        #print(type(r))
-        #print(r[key])
         var.append(r[key])
-        #print(*r)
-        #print(i)
-        #print(r.keys())
-        #print(*r.values())
-        #i = i + 1
     return var
  
-
-
 all_locations = execute_and_store('select "location" from "sites"', 'location')
-print("Here's all_locations")
-print(all_locations)
 
 # In Python, query the database for all of the **names** of the sites whose **descriptions** include the word `beautiful`. 
 # Save the resulting data in a variable called `beautiful_sites`.
 beautiful_sites = execute_and_store("select name from sites where description like '%beautiful%'", "name")
-print("Here's beautiful_sites")
-print(beautiful_sites)
 
 #In Python, query the database for the total number of **sites whose type is `National Lakeshore`.** Save the resulting data in a variable called `natl_lakeshores`.
 natl_lakeshores = execute_and_store("select count ('id') from sites where type = 'National Lakeshore'", "count")
-print("Here's natl_lakeshores")
-print(natl_lakeshores)
 
 # In Python, query your database for the **names of all the national sites in Michigan**. 
 # Save the resulting data in a variable called `michigan_names`. You should use an inner join query to do this.
-
 michigan_names = execute_and_store("select sites.name from sites inner join states on sites.state_id = states.id where states.name ilike '%michigan%';", "name")
-print("Here's michigan_names")
-print(michigan_names)
 
 # In Python, query your database for the **total number of sites in Arkansas**. Save the resulting data in a variable called `total_number_arkansas`. 
 # You can use multiple queries + Python code to do this, one subquery, or one inner join query. HINT: You'll need to use an aggregate function!
 total_number_arkansas = execute_and_store("select count (state_id) from sites inner join states on (sites.state_id = states.id) where states.name ilike '%arkansas%'", "count")
-print("Here's total_number_arkansas")
-print(total_number_arkansas)
-    
-
-
-
 
 # We have not provided any tests, but you could write your own in this file or another file, if you want.
